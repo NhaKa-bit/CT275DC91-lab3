@@ -129,4 +129,14 @@ public function save(): bool
 
     return null;
 }
+  public function delete(): bool
+  {
+      $statement = $this->db->prepare(
+          'DELETE FROM contacts WHERE id = :id'
+      );
+
+      return $statement->execute([
+          'id' => $this->id
+      ]);
+  }
 }
