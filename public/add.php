@@ -7,6 +7,7 @@ use CT275\Labs\Contact;
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     $contactData = [
         'name' => $_POST['name'] ?? '',
         'phone' => $_POST['phone'] ?? '',

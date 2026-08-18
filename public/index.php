@@ -2,34 +2,44 @@
 
 require_once __DIR__ . '/../src/bootstrap.php';
 
-include_once __DIR__ . '/../src/partials/header.php';
-
 use CT275\Labs\Contact;
 use CT275\Labs\Paginator;
 
 $contact = new Contact($PDO);
-$limit = (isset($_GET['limit']) && is_numeric($_GET['limit'])) ?
-(int)$_GET['limit'] : 5;
-$page = (isset($_GET['page']) && is_numeric($_GET['page'])) ?
-(int)$_GET['page'] : 1;
+
+$limit = (isset($_GET['limit']) && is_numeric($_GET['limit']))
+    ? (int) $_GET['limit']
+    : 5;
+
+$page = (isset($_GET['page']) && is_numeric($_GET['page']))
+    ? (int) $_GET['page']
+    : 1;
+
 $paginator = new Paginator(
-totalRecords: $contact->count(),
-recordsPerPage: $limit,
-currentPage: $page
+    totalRecords: $contact->count(),
+    recordsPerPage: $limit,
+    currentPage: $page
 );
-$contacts = $contact->paginate($paginator->recordOffset, $paginator->recordsPerPage);
+
+$contacts = $contact->paginate(
+    $paginator->recordOffset,
+    $paginator->recordsPerPage
+);
+
 $pages = $paginator->getPages(length: 3);
+
 include_once __DIR__ . '/../src/partials/header.php';
 ?>
 
 <body>
-  <?php include_once __DIR__ . '/../src/partials/navbar.php' ?>
+
+  <?php include_once __DIR__ . '/../src/partials/navbar.php'; ?>
 
   <!-- Main Page Content -->
   <div class="container">
 
     <?php
-    $subtitle = 'View your all contacs here.';
+    $subtitle = 'View your all contacts here.';
     include_once __DIR__ . '/../src/partials/heading.php';
     ?>
 
@@ -42,6 +52,7 @@ include_once __DIR__ . '/../src/partials/header.php';
 
         <!-- Table Starts Here -->
         <table id="contacts" class="table table-striped table-bordered">
+
           <thead>
             <tr>
               <th scope="col">Name</th>
@@ -51,92 +62,183 @@ include_once __DIR__ . '/../src/partials/header.php';
               <th scope="col">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <?php foreach ($contacts as $contact): ?>
-              <tr>
-                <td><?= html_escape($contact->name) ?></td>
 
-                <td><?= html_escape($contact->phone) ?></td>
+          <tbody>
+
+            <?php foreach ($contacts as $contact): ?>
+
+              <tr>
 
                 <td>
-                  <?= html_escape(date('d-m-Y', strtotime($contact->created_at))) ?>
+                  <?= html_escape($contact->name) ?>
                 </td>
 
-                <td><?= html_escape($contact->notes) ?></td>
+                <td>
+                  <?= html_escape($contact->phone) ?>
+                </td>
+
+                <td>
+                  <?= html_escape(
+                      date('d-m-Y', strtotime($contact->created_at))
+                  ) ?>
+                </td>
+
+                <td>
+                  <?= html_escape($contact->notes) ?>
+                </td>
 
                 <td class="d-flex justify-content-center">
+
+                  <!-- Edit -->
                   <a
-                    href="edit.php?id=<?= $contact->id ?>"
+                    href="<?= '/edit.php?id=' . $contact->id ?>"
                     class="btn btn-xs btn-warning"
                   >
-                    <i alt="Edit" class="fa fa-pencil"></i> Edit
+                    <i alt="Edit" class="fa fa-pencil"></i>
+                    Edit
                   </a>
 
+                  <!-- Delete -->
                   <a
-                    href="delete.php?id=<?= $contact->id ?>"
+                    href="#"
                     class="btn btn-xs btn-danger ms-1"
                   >
-                    <i alt="Delete" class="fa fa-trash"></i> Delete
+                    <i alt="Delete" class="fa fa-trash"></i>
+                    Delete
                   </a>
+
                 </td>
+
               </tr>
+
             <?php endforeach; ?>
+
           </tbody>
+
         </table>
         <!-- Table Ends Here -->
 
+
         <!-- Pagination -->
-       <nav class="d-flex justify-content-center">
+        <nav class="d-flex justify-content-center">
+
           <ul class="pagination">
-              <li class="page-item</= $paginator/>getPrevPage() ?
-        '' : ' disabled' ?>">
-              <a role="button"
-                  href="/?page=</= $paginator/>getPrevPage() ?>&limit=5"
-                  class="page-link">
-              <span>&laquo;</span>
-            </a>
+
+            <!-- Previous -->
+            <li class="page-item<?= $paginator->getPrevPage() ? '' : ' disabled' ?>">
+
+              <a
+                role="button"
+                href="<?= '/?page=' . $paginator->getPrevPage() . '&limit=' . $limit ?>"
+                class="page-link"
+              >
+                <span>«</span>
+              </a>
+
             </li>
-          <?php foreach ($pages as $page) : ?>
-            <li class="page-item<?= $paginator->currentPage === $page ?
-                  ' active' : '' ?>">
-          <a role="button" href="=?page=<?= $page ?>&limit=5"
-          class="page-link"><?= $page ?></a>
-          </li>
-          <?php endforeach ?>
-          <li class="page-item<?= $paginator->getNextPage() ?
-              '' : ' disabled' ?>">
-            <a role="button"
-                href="/?page=</= $paginator->getNextPage() ?>&limit=5"
-                class="page-link">
-                <span>&raquo;</span>
-          </a>
-        </li>
-      </ul>
-  </nav>
+
+
+            <!-- Page Numbers -->
+            <?php foreach ($pages as $pageNumber): ?>
+
+              <li
+                class="page-item<?= $paginator->currentPage === $pageNumber ? ' active' : '' ?>"
+              >
+
+                <a
+                  role="button"
+                  href="<?= '/?page=' . $pageNumber . '&limit=' . $limit ?>"
+                  class="page-link"
+                >
+                  <?= $pageNumber ?>
+                </a>
+
+              </li>
+
+            <?php endforeach; ?>
+
+
+            <!-- Next -->
+            <li class="page-item<?= $paginator->getNextPage() ? '' : ' disabled' ?>">
+
+              <a
+                role="button"
+                href="<?= '/?page=' . $paginator->getNextPage() . '&limit=' . $limit ?>"
+                class="page-link"
+              >
+                <span>»</span>
+              </a>
+
+            </li>
+
+          </ul>
+
+        </nav>
+
       </div>
     </div>
+
   </div>
 
+
+  <!-- Delete Confirmation -->
   <div id="delete-confirm" class="modal fade" tabindex="-1">
+
     <div class="modal-dialog">
+
       <div class="modal-content">
+
         <div class="modal-header">
-          <h4 class="modal-title">Confirmation</h4>
-          <button type="button" class="btn-close" data-bs-dismiss="modal">
-          </button>
+
+          <h4 class="modal-title">
+            Confirmation
+          </h4>
+
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+          ></button>
+
         </div>
-        <div class="modal-body">Do you want to delete this contact?</div>
+
+        <div class="modal-body">
+          Do you want to delete this contact?
+        </div>
+
         <div class="modal-footer">
-          <button type="button" data-bs-dismiss="modal" class="btn btn-danger" id="delete">Delete</button>
-          <button type="button" data-bs-dismiss="modal" class="btn btn-default">Cancel</button>
+
+          <button
+            type="button"
+            data-bs-dismiss="modal"
+            class="btn btn-danger"
+            id="delete"
+          >
+            Delete
+          </button>
+
+          <button
+            type="button"
+            data-bs-dismiss="modal"
+            class="btn btn-default"
+          >
+            Cancel
+          </button>
+
         </div>
+
       </div>
+
     </div>
+
   </div>
 
-  <?php include_once __DIR__ . '/../src/partials/footer.php' ?>
+
+  <?php include_once __DIR__ . '/../src/partials/footer.php'; ?>
+
   <script>
   </script>
+
 </body>
 
 </html>
