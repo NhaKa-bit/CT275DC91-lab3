@@ -6,7 +6,7 @@ Học kỳ 3, Năm học: 2025-2026
 
 **MSSV**: DC25V7K012
 
-**Lớp HP**: CT275DC01
+**Lớp HP**: DC01CT275
 
 
 
